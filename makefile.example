@@ -1,0 +1,33 @@
+PKG=github.com/cahlchang/lambda-go-processor
+NAME=lambda-go-processor
+
+BUCKET=YOUR_BUCKET
+DIR=YOUR_DIR
+AWS_PROFILE=YOUR_PROFILE
+
+CURRENT_VERSION = $(shell git describe --tags 2> /dev/null || git rev-parse --abbrev-ref HEAD)
+CURRENT_REVISION = $(shell git rev-parse HEAD)
+CURRENT_REVISION_SHORT = $(shell git rev-parse HEAD)
+
+.PHONY: setup test build run upload 
+
+run:
+	go run main.go
+
+test:
+	go test ./...
+
+build:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o $(NAME) -ldflags "-X main.version=$(CURRENT_VERSION) -X main.revision=$(CURRENT_REVISION_SHORT)"
+
+build_local:
+	go build -o $(NAME) -ldflags "-X main.version=$(CURRENT_VERSION) -X main.revision=$(CURRENT_REVISION_SHORT)"
+
+upload: build
+	aws s3 cp --profile ${AWS_PROFILE} $(NAME) s3://$(BUCKET)/${DIR}/$(NAME)-$(CURRENT_VERSION)
+
+setup:
+	go get github.com/golang/lint/golint
+	go get github.com/golang/dep/cmd/dep
+	dep ensure
+

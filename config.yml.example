@@ -1,0 +1,10 @@
+# カレントディレクトリから.shファイルをgrepする例
+caller:
+  - name: 'ls
+    args:
+      - "-l"
+      - "-a"
+    pipe:
+      - name: 'grep'
+        args:
+          - ".sh"
