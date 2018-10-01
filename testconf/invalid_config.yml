@@ -1,0 +1,10 @@
+# invalid yaml
+caller:
+  - name: 'echo'
+    args:
+      "-e"
+      "one\ntwo\nthree"
+      pipe:
+        - name: 'grep'
+          args:
+            - "two"
